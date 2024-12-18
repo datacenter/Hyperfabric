@@ -30,6 +30,7 @@ url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabricId}"
 payloadList = ["{'description': 'REST API'}",
                '{"description": "REST API"}',
                "{description: 'REST API'}",
+               "{description: REST API}",
                "{description: \"REST API\"}"]
 
 headers = {
