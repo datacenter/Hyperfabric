@@ -27,7 +27,10 @@ url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabricId}"
 # }
 #
 
-payload = '{"description": "REST API"}'
+payloadList = ["{'description': 'REST API'}",
+               '{"description": "REST API"}',
+               "{description: 'REST API'}",
+               "{description: \"REST API\"}"]
 
 headers = {
   "Content-Type": "application/json",
@@ -35,6 +38,8 @@ headers = {
   "Authorization": "Bearer " + token,
 }
 
-response = requests.request('PUT', url, headers=headers, data=payload)
-print(response.json())
+for payload in payloadList:
+    print(f"sending payload {payload}")
+    response = requests.request('PUT', url, headers=headers, data=payload)
+    print(response.json())
 
