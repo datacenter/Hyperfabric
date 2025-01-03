@@ -45,12 +45,18 @@ def generateBirdName():
     return f"{randomAdjective} {randomBird}"
 
 def main():
-    # Get the current definition.
+    # Get the current definition
+    # the data model is {"fabricId": string, 
+    #                    "name": string, 
+    #                    "description": string, 
+    #                    "location": string, 
+    #                    "address": string}
+    #
     response = requests.request('GET', url, headers=headers, verify=True)
     fabric = response.json()
     print(f"CURRENT DESCRIPTION ==> {json.dumps(fabric['description'])}")
 
-    # Update the description of the fabric.
+    # Update the description of the fabric and PUT the entire updated fabric structure
     fabric['description'] = generateBirdName()
     payload = json.dumps(fabric)
     response = requests.request('PUT', url, headers=headers, data=payload, verify=True)
