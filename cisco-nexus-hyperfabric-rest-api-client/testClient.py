@@ -1,15 +1,18 @@
+import json
+import os
+from pprint import pprint
 from cisco_nexus_hyperfabric_rest_api_client import AuthenticatedClient
 from cisco_nexus_hyperfabric_rest_api_client.models import models_fabric 
 from cisco_nexus_hyperfabric_rest_api_client.types import Response
 from cisco_nexus_hyperfabric_rest_api_client.api.fabrics import fabrics_get_all_fabrics
-import pprint
-import json
 
-authToken = 'eyJhbGciOiJFZERTQSIsImtpZCI6IjU0ZjAwZTM4NjBlMjE1MjgzMjBlZjQ0YzEwODBhMTVlNzdlZDEzOTViODQ3OGM2MzVlOWUwZGIyMmM5MjkyNzQiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE3NjM2MzcxMTksImp0aSI6Ijc5YmJiODM0LTAzYzMtNGE3Yi04N2NjLThmZGU4OGVmZjBiYyIsImlhdCI6MTczMjEwMTExOSwiaXNzIjoiQ2lzY28gTmV4dXMgSHlwZXJGYWJyaWMiLCJuYmYiOjE3MzIxMDExMTksInN1YiI6ImNwYWdnZW5AY2lzY28uY29tIn0.rHBBW6ygzyZOHCPDBI_epnZ6mbcLAPPrhclqbdTcEZd4GKW6Ly08vQw0GZVxGZDAEXHuvcn-cLGEL2gJwLgbDQ'
+authToken = os.environ.get('AUTH_TOKEN')
 
-client = AuthenticatedClient(base_url="https://hyperfabric.cisco.com", token=authToken)
-#foo: models_fabric = fabrics_get_all_fabrics.sync(client=client)
-response: Response[models_fabric] = fabrics_get_all_fabrics.sync_detailed(client=client)
-pprint.pprint(json.loads(response.content))
+def main():
+    client = AuthenticatedClient(base_url="https://hyperfabric.cisco.com", token=authToken)
+    response: Response[models_fabric] = fabrics_get_all_fabrics.sync_detailed(client=client)
+    fabrics = json.loads(response.content)
+    pprint(fabrics)
 
-
+if __name__ == "__main__":
+    main()
