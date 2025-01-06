@@ -1,5 +1,6 @@
 # cisco-nexus-hyperfabric-rest-api-client
 A client library for accessing Cisco Nexus Hyperfabric REST API
+
 The entire SDK is generated from the OpenAPI spec with
 ```bash
 openapi-python-client generate --path ./cisco_nexus_hyperfabric_rest_api_1_0_0_rev_1.json
