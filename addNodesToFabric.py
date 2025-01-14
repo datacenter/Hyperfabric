@@ -13,18 +13,18 @@ headers = {
   "Authorization": "Bearer " + authToken,
 }
 
-def deleteFabNodes(fabName):
+def deleteAllFabNodes(fabName):
     endpoint = f'https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/nodes'
     nodes = requests.request('GET', endpoint, headers=headers, verify=True)
     nodes = json.loads(nodes.text)
     if len(nodes) == 0:
-        return
+        return 1
     for node in nodes['nodes']:
         print(f"Deleting node {node['name']}")
         n = node['name']
         endpoint = f'https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/nodes/{n}'
         delete = requests.request('DELETE', endpoint, headers=headers, verify=True) 
-        print(delete.text)
+        print(delete)
 
 def genPayload(numDevices,devRole):
     nodeDict = {}
@@ -51,7 +51,10 @@ def pushChanges(endpoint,payload):
 
 def main(fabName,numDevices,devRole):
     if numDevices == 0:
-        deleteFabNodes(fabName)
+        status = deleteAllFabNodes(fabName)
+        if status:
+            print("Fabric has no devices")
+        sys.exit(0)
     payload = genPayload(numDevices,devRole)
     url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/nodes"
     pushChanges(url,payload)
