@@ -17,6 +17,8 @@ def getFabNodes(fabName):
     endpoint = f'https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/nodes'
     nodes = requests.request('GET', endpoint, headers=headers, verify=True)
     nodes = json.loads(nodes.text)
+    if len(nodes) == 0:
+        return
     for node in nodes['nodes']:
         print(f"Deleting node {node['name']}")
         n = node['name']
