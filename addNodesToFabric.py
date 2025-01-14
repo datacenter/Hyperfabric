@@ -13,7 +13,7 @@ headers = {
   "Authorization": "Bearer " + authToken,
 }
 
-def getFabNodes(fabName):
+def deleteFabNodes(fabName):
     endpoint = f'https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/nodes'
     nodes = requests.request('GET', endpoint, headers=headers, verify=True)
     nodes = json.loads(nodes.text)
@@ -50,7 +50,7 @@ def pushChanges(endpoint,payload):
     print(f"Response ==> {json.dumps(fabric)}")
 
 def main(fabName,numDevices):
-    nodes = getFabNodes(fabName)
+    nodes = deleteFabNodes(fabName)
     payload = genPayload(numDevices)
     url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/nodes"
     pushChanges(url,payload)
