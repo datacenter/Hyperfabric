@@ -18,4 +18,4 @@ This repository includes code samples written in Python to automate common Nexus
 
 All access to Cisco Nexus Hyperfabric requires a bearer token. Obtain a token by selecting 'API bearer tokens' after clicking on your username in the top right-hand corner of the screen once logged into [hyperfabric.cisco.com](https://hyperfabric.cisco.com)
 
-Add the token as an environment variable by using `` export AUTH_TOKEN=`cat AUTH_TOKEN` ``` for example.
+Add the token as an environment variable by using ``` export AUTH_TOKEN=`cat AUTH_TOKEN` ``` for example.
