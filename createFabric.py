@@ -4,38 +4,38 @@ import sys
 
 token = os.environ['AUTH_TOKEN']
 
-payload = {
-  "fabrics": [
-    {
-      "name": "CP-AUTOMATION-TEST",
-      "description": "My DC Fabric",
-      "address": "170 West Tasman Dr.",
-      "city": "San Jose",
-      "country": "United States of America",
-      "location": "SJ1-1-AA1",
-      "labels": ["prod", "blue"],
-      "annotations": [
-        {
-          "name": "color",
-          "value": "blue"
-        },
-        {
-          "dataType": "BOOL",
-          "name": "isDMZ",
-          "value": "false"
-        },
-      ],
-    },
-  ]
-}
-
 headers = {
   "Content-Type": "application/json",
   "Accept": "application/json",
   "Authorization": "Bearer " + token,
 }
 
-def main(fabName):
+def main(fabName: str) -> requests.Response:
+    payload = {
+      "fabrics": [
+        {
+          "name": f"{fabName}",
+          "description": "My DC Fabric",
+          "address": "170 West Tasman Dr.",
+          "city": "San Jose",
+          "country": "United States of America",
+          "location": "SJ1-1-AA1",
+          "labels": ["prod", "blue"],
+          "annotations": [
+            {
+              "name": "color",
+              "value": "blue"
+            },
+            {
+              "dataType": "BOOL",
+              "name": "isDMZ",
+              "value": "false"
+            },
+           ],
+         },
+       ]
+      }
+
     response = requests.post(url, headers=headers, json=payload)
     fabrics = response.json()
     print(fabrics)
