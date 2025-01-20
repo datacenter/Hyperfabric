@@ -4,7 +4,7 @@ This repository provides code samples to automate various tasks related to Cisco
 
 **What is Cisco Nexus Hyperfabric?**
 
-Cisco Nexus Hyperfabric is a data center fabric technology that simplifies the deployment, management, and operation of high-performance data center networks. It offers a scalable, automated, and low-latency fabric solution for mission-critical applications.
+Cisco Nexus® Hyperfabric[https://www.cisco.com/c/en/us/products/collateral/data-center-networking/nexus-hyperfabric/nexus-hyperfabric-ds.html] is a cloud-managed network fabric data-center solution, delivered as a service, that enables customers to easily design, deploy, manage, and scale multiple fabrics globally with a minimum of expertise.
 
 **What's in this repository?**
 
