@@ -2,10 +2,9 @@ import requests
 import json
 import os
 import random
+import sys
 
 token = os.environ['AUTH_TOKEN']
-fabricId = 'BRU-AUTOMATION'
-url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabricId}"
 
 birdNames = [
     "Eagle", "Hawk", "Owl", "Falcon", "Vulture", 
@@ -44,7 +43,7 @@ def generateBirdName():
     randomBird = random.choice(birdNames)
     return f"{randomAdjective} {randomBird}"
 
-def main():
+def main(fabName: str) -> requests.Response:
     # Get the current definition
     # the data model is {"fabricId": string, 
     #                    "name": string, 
@@ -52,8 +51,12 @@ def main():
     #                    "location": string, 
     #                    "address": string}
     #
+    url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}"
     response = requests.request('GET', url, headers=headers, verify=True)
+    if response.status_code != 200:
+        sys.exit("Does this fabric exist?")
     fabric = response.json()
+    print(fabric)
     try: 
         curDescr = json.dumps(fabric['description'])
         print(f"Current description ==> {curDescr}")
@@ -66,4 +69,7 @@ def main():
     print(f"UPDATED DESCRIPTION ==> {json.dumps(fabric['description'])}")
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 2:
+        sys.exit(f"Usage {sys.argv[0]} <fabricName>")
+    fabName = sys.argv[1]
+    main(fabName)
