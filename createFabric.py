@@ -1,10 +1,8 @@
 import requests
 import os
+import sys
 
-url = "https://hyperfabric.cisco.com/api/v1/fabrics"
 token = os.environ['AUTH_TOKEN']
-# token = '{token}'
-
 
 payload = {
   "fabrics": [
@@ -37,7 +35,15 @@ headers = {
   "Authorization": "Bearer " + token,
 }
 
-response = requests.post(url, headers=headers, json=payload)
-fabrics = response.json()
-print(fabrics)
+def main(fabName):
+    response = requests.post(url, headers=headers, json=payload)
+    fabrics = response.json()
+    print(fabrics)
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        sys.exit(f"Usage {sys.argv[0]} <fabricName>")
+    url = "https://hyperfabric.cisco.com/api/v1/fabrics"
+    fabName = sys.argv[1]
+    main(fabName)
 
