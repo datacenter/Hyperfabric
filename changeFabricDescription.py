@@ -4,7 +4,7 @@ import os
 import random
 
 token = os.environ['AUTH_TOKEN']
-fabricId = '0bf78152-ced0-47ac-885a-f799687f8313'
+fabricId = 'BRU-AUTOMATION'
 url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabricId}"
 
 birdNames = [
@@ -54,8 +54,11 @@ def main():
     #
     response = requests.request('GET', url, headers=headers, verify=True)
     fabric = response.json()
-    print(f"CURRENT DESCRIPTION ==> {json.dumps(fabric['description'])}")
-
+    try: 
+        curDescr = json.dumps(fabric['description'])
+        print(f"Current description ==> {curDescr}")
+    except KeyError:
+        print("No current description set")
     # Update the description of the fabric and PUT the entire updated fabric structure
     fabric['description'] = generateBirdName()
     payload = json.dumps(fabric)
