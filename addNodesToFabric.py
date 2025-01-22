@@ -1,3 +1,5 @@
+from typing import Dict, List, Union
+
 import random
 import sys
 import json
@@ -13,21 +15,22 @@ headers = {
   "Authorization": "Bearer " + authToken,
 }
 
-def deleteAllFabNodes(fabName,devRole):
+def deleteAllFabNodes(fabName: str, devRole: str) -> int:
     endpoint = f'https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/nodes'
     nodes = requests.request('GET', endpoint, headers=headers, verify=True)
     nodes = json.loads(nodes.text)
     if len(nodes) == 0:
-        return 1
+        return 0
     for node in nodes['nodes']:
         if devRole in node['roles']:
             print(f"Deleting node {node['name']}")
             n = node['name']
             endpoint = f'https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/nodes/{n}'
             delete = requests.request('DELETE', endpoint, headers=headers, verify=True) 
-            print(delete)
+            print(delete.status_code)
+    return 1
 
-def genPayload(numDevices,devRole):
+def genPayload(numDevices: int, devRole: str) -> Dict[str, List[Dict]]:
     nodeDict = {}
     nodes = []
     for i in range(numDevices):
@@ -44,19 +47,36 @@ def genPayload(numDevices,devRole):
     nodeDict['nodes']=nodes
     return nodeDict
 
-def pushChanges(endpoint,payload):
+def pushChanges(endpoint: str, payload: Dict) -> Union[Dict, int]:
     response = requests.request('POST', endpoint, headers=headers, json=payload, verify=True)
     fabric = response.json()
     print(f"Response ==> {json.dumps(fabric)}")
+    if response.status_code == 409:
+        # conflict, node(s) already present
+        return 0
+    else:
+        return 1
 
-def main(fabName,numDevices,devRole):
+def commitChanges(fabName: str) -> None:
+    url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/candidates/default"
+    payload = {"comments": "Automated commit"}
+    print("Committing changes ...")
+    pushChanges(url,payload)
+
+def main(fabName: str, numDevices: int, devRole: str) -> None:
     if numDevices == 0:
+        # user wants to delete all nodes with given role
         status = deleteAllFabNodes(fabName,devRole)
-        if status:
-            sys.exit("Fabric has no devices")
+        if not status:
+            sys.exit(f"Fabric has no {devRole} devices")
+        # commit deletion and bail out
+        sys.exit(commitChanges(fabName))
+    # build the JSON payload for the number of devices required
     payload = genPayload(numDevices,devRole)
     url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/nodes"
-    pushChanges(url,payload)
+    if (pushChanges(url,payload)):
+        # commit changes to the fabric if JSON payload was accepted by REST API
+        commitChanges(fabName)
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
