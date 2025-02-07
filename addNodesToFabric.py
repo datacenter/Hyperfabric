@@ -47,7 +47,7 @@ def genPayload(numDevices: int, devRole: str) -> Dict[str, List[Dict]]:
     nodeDict['nodes']=nodes
     return nodeDict
 
-def pushChanges(endpoint: str, payload: Dict) -> Union[Dict, int]:
+def pushChanges(endpoint: str, payload: Dict) -> int:
     response = requests.request('POST', endpoint, headers=headers, json=payload, verify=True)
     fabric = response.json()
     print(f"Response ==> {json.dumps(fabric)}")
