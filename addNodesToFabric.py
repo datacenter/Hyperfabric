@@ -51,11 +51,8 @@ def pushChanges(endpoint: str, payload: Dict) -> Union[Dict, int]:
     response = requests.request('POST', endpoint, headers=headers, json=payload, verify=True)
     fabric = response.json()
     print(f"Response ==> {json.dumps(fabric)}")
-    if response.status_code == 409:
-        # conflict, node(s) already present
-        return 0
-    else:
-        return 1
+    # HTTP 409 means a conflict exists
+    return 0 if response.status_code == 409 else 1
 
 def commitChanges(fabName: str) -> None:
     url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/candidates/default"
@@ -63,7 +60,14 @@ def commitChanges(fabName: str) -> None:
     print("Committing changes ...")
     pushChanges(url,payload)
 
+def fabricExists(fabName: str) -> int:
+    url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}"
+    fabric = requests.request('GET', url, headers=headers, verify=True)
+    return 1 if fabric.status_code == 200 else 0
+
 def main(fabName: str, numDevices: int, devRole: str) -> None:
+    if not fabricExists(fabName):
+        sys.exit("No such fabric found!")
     if numDevices == 0:
         # user wants to delete all nodes with given role
         status = deleteAllFabNodes(fabName,devRole)
