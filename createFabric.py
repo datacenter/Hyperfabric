@@ -1,6 +1,7 @@
 import requests
 import os
 import sys
+import json
 
 token = os.environ['AUTH_TOKEN']
 
@@ -9,6 +10,12 @@ headers = {
   "Accept": "application/json",
   "Authorization": "Bearer " + token,
 }
+
+def commitChanges(fabName: str) -> requests.Response:
+    url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}/candidates/default"
+    payload = {"comments": "Automated commit"}
+    response = requests.post(url, headers=headers, json=payload)
+    return response
 
 def main(fabName: str) -> requests.Response:
     payload = {
@@ -37,8 +44,13 @@ def main(fabName: str) -> requests.Response:
       }
 
     response = requests.post(url, headers=headers, json=payload)
+    if response.status_code == 409:
+        sys.exit("Fabric already exists")
     fabrics = response.json()
     print(fabrics)
+    commit = commitChanges(fabName)
+    print("Committing changes ..")
+    print(commit.json())
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
