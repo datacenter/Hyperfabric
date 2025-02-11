@@ -3,8 +3,15 @@ import json
 import os
 import random
 import sys
+import logging
+
 
 token = os.environ['AUTH_TOKEN']
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+baseUrl = "https://hyperfabric.cisco.com/api/v1"
 
 birdNames = [
     "Eagle", "Hawk", "Owl", "Falcon", "Vulture", 
@@ -38,10 +45,16 @@ headers = {
   "Authorization": "Bearer " + token,
 }
 
-def generateBirdName():
+def generateBirdName() -> str:
     randomAdjective = random.choice(birdAdjectives)
     randomBird = random.choice(birdNames)
     return f"{randomAdjective} {randomBird}"
+
+def commitChanges(fabName: str) -> None:
+    url = f"{baseUrl}/fabrics/{fabName}/candidates/default"
+    payload = {"comments": "Automated commit"}
+    response = requests.request('POST', url, headers=headers, json=payload, verify=True)
+    logger.info(response.json())
 
 def main(fabName: str) -> requests.Response:
     # Get the current definition
@@ -51,22 +64,24 @@ def main(fabName: str) -> requests.Response:
     #                    "location": string, 
     #                    "address": string}
     #
-    url = f"https://hyperfabric.cisco.com/api/v1/fabrics/{fabName}"
+    url = f"{baseUrl}/fabrics/{fabName}"
     response = requests.request('GET', url, headers=headers, verify=True)
     if response.status_code != 200:
         sys.exit("Does this fabric exist?")
     fabric = response.json()
-    print(fabric)
+    logger.info(fabric)
     try: 
         curDescr = json.dumps(fabric['description'])
-        print(f"Current description ==> {curDescr}")
+        logger.info(f"Current description ==> {curDescr}")
     except KeyError:
-        print("No current description set")
+        logger.info("No current description set")
     # Update the description of the fabric and PUT the entire updated fabric structure
     fabric['description'] = generateBirdName()
     payload = json.dumps(fabric)
     response = requests.request('PUT', url, headers=headers, data=payload, verify=True)
-    print(f"UPDATED DESCRIPTION ==> {json.dumps(fabric['description'])}")
+    logger.info(f"Updated description ==> {json.dumps(fabric['description'])}")
+    logger.info("Commit changes")
+    commitChanges(fabName)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
