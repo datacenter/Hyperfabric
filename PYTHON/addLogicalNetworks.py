@@ -37,7 +37,7 @@ def create_vrf(fabric_id, vrf_name):
         logger.error(f"Failed to create VRF: {e}")
         return None
 
-def create_vni(fabric_id, vni_name, vnid, vni_descr, vrf_id, ipv4_gw):
+def create_vni(fabric_id, vni_name, vnid, vni_descr, vrf_name, ipv4_gw, ipv6_gw, members, svis):
     url = f"{BASE_URL}/fabrics/{fabric_id}/vnis"
     payload = {
       "vnis": [
@@ -49,31 +49,9 @@ def create_vni(fabric_id, vni_name, vnid, vni_descr, vrf_id, ipv4_gw):
           ],
           "enabled": True,
           "vni": vnid,
-          "members": [
-            {
-              "port": {
-                "portName": "Ethernet1_5",
-                "nodeName": "node-LEAF0"
-              },
-              "vlanId": 100,
-              "untagged": False
-            },
-            {
-              "port": {
-                "portName": "Ethernet1_5",
-                "nodeName": "node-LEAF1"
-              },
-              "vlanId": 100,
-              "untagged": False
-            }
-          ],
-          "svis": [
-            {
-              "enabled": True,
-              "ipv4Addresses": [ipv4_gw],
-              "vlanId": 100
-            }
-          ]
+          "members": members,
+          "svis": svis,
+          "vrfId": vrf_name
         }
        ]
       } 
@@ -95,15 +73,42 @@ def main():
     vrf_name  = "VRF-One"
     vni_name  = "network-one"
     ipv4_gw   = "192.168.1.1/24"
+    ipv6_gw   = "2001::1/64"
     vnid      = 12000
     vni_descr = "logical network one"
+    vni_members = [
+            {
+              "port": {
+                "portName": "Ethernet1_5",
+                "nodeName": "node-LEAF0"
+              },
+              "vlanId": 100,
+              "untagged": False
+            },
+            {
+              "port": {
+                "portName": "Ethernet1_5",
+                "nodeName": "node-LEAF1"
+              },
+              "vlanId": 100,
+              "untagged": False
+            }
+          ]
+    svis = [
+            {
+              "enabled": True,
+              "ipv4Addresses": [ipv4_gw],
+              "ipv6Addresses": [ipv6_gw],
+              "vlanId": 100
+            }
+          ]
 
     vrf_id = create_vrf(fabric_id, vrf_name)
     if not vrf_id:
         logger.error("Failed to create VRF. Exiting.")
         return
 
-    vni_result = create_vni(fabric_id, vni_name, vnid, vni_descr, vrf_id, ipv4_gw)
+    vni_result = create_vni(fabric_id, vni_name, vnid, vni_descr, vrf_name, ipv4_gw, ipv6_gw, vni_members, svis)
     if not vni_result:
         logger.error("Failed to create VNI. Exiting.")
         return
