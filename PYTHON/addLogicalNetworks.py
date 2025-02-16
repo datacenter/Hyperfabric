@@ -29,7 +29,7 @@ def create_vrf(fabric_id, vrf_name):
         response.raise_for_status()
         vrf_data = response.json()
         logger.info(f"VRF '{vrf_name}' created successfully.")
-        return vrf_data['vrfs'][0]['id']
+        return 1
     except requests.exceptions.RequestException as e:
         if e.response is not None and e.response.status_code == 409:
             logger.warning(f"VRF '{vrf_name}' already exists. Skipping")
@@ -82,7 +82,7 @@ def create_vni(fabric_id, vni_name, vnid, vni_descr, vrf_id, ipv4_gw):
         response.raise_for_status()
         vni_data = response.json()
         logger.info(f"VNI '{vni_name}' created successfully.")
-        return vni_data
+        return 1
     except requests.exceptions.RequestException as e:
         if e.response is not None and e.response.status_code == 409:
             logger.warning("VNI already exists. Skipping.")
