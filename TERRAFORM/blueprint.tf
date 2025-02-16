@@ -98,7 +98,7 @@ resource "hyperfabric_node" "nodemap" {
   name          = each.value["name"]
   roles         = each.value["roles"]
   serial_number = each.value["serial_number"]
-  description   = each.value["serial_number"]
+  description   = each.value["description"]
   model_name    = each.value["model_name"]
   location      = each.value["location"]
   labels        = each.value["labels"]
